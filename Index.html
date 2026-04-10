@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JioSociety</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:#fff;height:100vh;overflow:hidden}
+:root{--brand:#1a56db;--brand-light:#e8f0fb;--gray:#6b7280;--gray-light:#f3f4f6;--gray-border:#d1d5db;--green:#16a34a;--green-light:#f0fdf4;--green-border:#bbf7d0;--red:#dc2626;--red-light:#fef2f2;--red-border:#fecaca;--amber:#d97706;--amber-light:#fffbeb;--amber-border:#fde68a;--text:#111;--text-secondary:#374151}
+.app{width:100%;height:100vh;position:relative;overflow:hidden}
+.screen{display:none;height:100%;overflow:auto}.screen.active{display:flex}
+.screen-center{flex-direction:column;align-items:center;justify-content:center;padding:40px;width:100%}
+.screen-split{flex-direction:row;width:100%}
+.back-btn{position:absolute;top:12px;right:24px;z-index:10;background:none;border:1.5px solid var(--gray-border);border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;color:var(--gray);cursor:pointer;font-family:'DM Sans',sans-serif;display:none}.back-btn:hover{border-color:var(--brand);color:var(--brand)}
+.sidebar{width:250px;min-height:100%;background:#fafafa;border-right:1px solid var(--gray-border);padding:32px 24px;flex-shrink:0}
+.sidebar-logo{display:flex;align-items:center;gap:10px;margin-bottom:40px}.sidebar-logo-circle{width:36px;height:36px;border-radius:50%;background:var(--brand);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px}.sidebar-logo-text{font-weight:800;font-size:18px;color:var(--brand)}
+.sidebar-step{display:flex;align-items:center;gap:12px;padding:14px 0;border-left:3px solid transparent;padding-left:16px}.sidebar-step.active{border-left-color:var(--brand)}
+.sidebar-step-num{width:28px;height:28px;border-radius:50%;background:var(--gray-light);color:var(--gray);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}.sidebar-step.active .sidebar-step-num,.sidebar-step.done .sidebar-step-num{background:var(--brand);color:#fff}
+.sidebar-step-label{font-size:14px;font-weight:500;color:var(--gray)}.sidebar-step.active .sidebar-step-label{font-weight:700;color:var(--brand)}.sidebar-step.done .sidebar-step-label{color:var(--text-secondary)}
+.content{flex:1;padding:36px 48px;overflow-y:auto}.content h2{font-size:22px;font-weight:800;color:var(--text)}.content .subtext{color:var(--gray);font-size:14px;margin-top:4px;margin-bottom:32px}
+.form-area{max-width:480px}.section-label{font-size:14px;font-weight:700;color:var(--text-secondary);margin-bottom:12px;margin-top:28px}
+.field{margin-bottom:20px}.field label{display:block;font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px}.field input,.field select,.field textarea{width:100%;padding:12px 14px;border:1.5px solid var(--gray-border);border-radius:8px;font-size:15px;font-family:'DM Sans',sans-serif;outline:none;color:var(--text);background:#fff}.field input:focus,.field textarea:focus{border-color:var(--brand)}.field textarea{resize:vertical;min-height:48px}
+.field-error{border-color:var(--red) !important}.field-error-msg{color:var(--red);font-size:12px;font-weight:600;margin-top:4px;display:none}
+.row-2{display:flex;gap:16px}.row-2 .field{flex:1}
+.btn-primary{padding:14px 28px;background:var(--brand);color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif}.btn-primary.full{width:100%}.btn-primary:hover{opacity:.9}.btn-primary:disabled{background:var(--gray-border);color:var(--gray);cursor:not-allowed}
+.btn-sm{padding:7px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;border:none}.btn-sm-brand{background:var(--brand);color:#fff}
+.btn-secondary{background:none;border:none;color:var(--brand);font-weight:600;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;padding:0}
+.btn-outline{padding:10px 20px;background:#fff;color:var(--brand);border:1.5px solid var(--brand);border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}.btn-outline:hover{background:var(--brand-light)}
+.btn-danger-sm{padding:6px 12px;background:#fff;color:var(--red);border:1.5px solid var(--red-border);border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap}.btn-danger-sm:hover{background:var(--red-light)}
+.btn-green{padding:10px 20px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;display:inline-flex;align-items:center;gap:8px}.btn-green:hover{opacity:.9}
+.btn-ghost{padding:14px 28px;background:none;color:var(--gray);border:1.5px solid var(--gray-border);border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}.btn-ghost:hover{border-color:var(--brand);color:var(--brand)}
+.upload-field{margin-bottom:20px}.upload-field label{display:block;font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px}.upload-box{border:1.5px dashed var(--gray-border);border-radius:8px;padding:16px;text-align:center;cursor:pointer;background:var(--gray-light);color:var(--gray);font-size:14px}.upload-box.done{border-color:var(--green);background:var(--green-light);color:var(--green);font-weight:600}
+.otp-row{display:flex;gap:10px;margin-bottom:28px;justify-content:center}.otp-input{width:52px;height:60px;text-align:center;font-size:24px;font-weight:700;border:1.5px solid var(--gray-border);border-radius:10px;outline:none;font-family:'DM Sans',sans-serif;color:var(--text)}.otp-input:focus{border-color:var(--brand)}.otp-input.filled{border-color:var(--brand)}
+.tabs{display:flex;margin-bottom:24px}.tab{flex:1;padding:16px 20px;border:1.5px solid var(--gray-border);cursor:pointer}.tab:first-child{border-radius:10px 0 0 10px}.tab:last-child{border-radius:0 10px 10px 0}.tab.active{border-color:var(--brand);background:var(--brand-light)}.tab-title{font-weight:700;font-size:14px;color:var(--text-secondary)}.tab.active .tab-title{color:var(--brand)}.tab-sub{font-size:12px;color:var(--gray);margin-top:2px}.tab.active .tab-sub{color:var(--brand)}
+.excel-drop{border:2px dashed var(--gray-border);border-radius:12px;padding:48px;text-align:center;background:var(--gray-light)}.excel-drop .arrow{font-size:36px;margin-bottom:12px;color:var(--gray)}.excel-drop p{font-weight:600;font-size:15px;color:var(--text-secondary)}.excel-drop .sub{font-size:13px;color:var(--gray);font-weight:400}
+.auto-cards{display:flex;gap:16px;margin-bottom:20px}.auto-card{flex:1;padding:12px 14px;background:var(--gray-light);border-radius:8px;font-size:13px}.auto-card .label{color:var(--gray);font-size:11px;margin-bottom:2px}.auto-card .value{font-weight:600;color:var(--text)}
+.verified-banner{padding:12px 16px;background:var(--green-light);border:1px solid var(--green-border);border-radius:8px;margin-bottom:20px;display:flex;align-items:center;gap:8px}.verified-banner .icon{color:var(--green);font-weight:700;font-size:18px}.verified-banner .text{color:var(--green);font-weight:600;font-size:14px}
+.divider{height:1px;background:var(--gray-border);margin:28px 0}
+.jio-logo{width:56px;height:56px;border-radius:50%;background:var(--brand);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:20px}.jio-logo.small{width:48px;height:48px;font-size:17px}
+.input-wrap{width:100%;max-width:380px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}.animate-in{animation:fadeUp .5s ease forwards}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:560px;margin-top:24px}
+.dash-tile{padding:28px 24px;border:1.5px solid var(--gray-border);border-radius:14px;cursor:pointer;transition:all .2s;background:#fff;display:flex;flex-direction:column;gap:8px}.dash-tile:hover{border-color:var(--brand);box-shadow:0 2px 12px rgba(26,86,219,.08)}
+.dash-tile.active-tile{border-color:var(--brand);background:var(--brand-light)}.dash-tile.disabled-tile{opacity:.45;cursor:not-allowed;pointer-events:none}
+.dash-tile-icon{width:44px;height:44px;border-radius:10px;background:var(--brand-light);display:flex;align-items:center;justify-content:center;color:var(--brand)}.dash-tile-title{font-size:16px;font-weight:700;color:var(--text);margin-top:4px}.dash-tile-sub{font-size:13px;color:var(--gray)}
+.coll-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}.coll-header-left{display:flex;align-items:center;gap:12px}.coll-header-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.coll-select{padding:10px 14px;border:1.5px solid var(--gray-border);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;color:var(--text);background:#fff;cursor:pointer;font-weight:600}
+.coll-table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}.coll-table th{text-align:left;padding:8px 12px;background:var(--gray-light);font-weight:700;color:var(--text-secondary);border-bottom:1.5px solid var(--gray-border);white-space:nowrap;position:relative}.coll-table td{padding:10px 12px;border-bottom:1px solid var(--gray-light);vertical-align:middle}.coll-table tr:hover td{background:#fafafa}
+.status-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap}
+.status-paid{background:var(--green-light);color:var(--green);border:1px solid var(--green-border)}.status-pending{background:var(--amber-light);color:var(--amber);border:1px solid var(--amber-border)}.status-overdue{background:var(--red-light);color:var(--red);border:1px solid var(--red-border)}.status-not-sent{background:var(--gray-light);color:var(--gray);border:1px solid var(--gray-border)}.status-unclaimed{background:#f5f3ff;color:#7c3aed;border:1px solid #ddd6fe}.status-no-request{background:#fef3c7;color:#92400e;border:1px solid #fde68a}
+.coll-checkbox{width:18px;height:18px;accent-color:var(--brand);cursor:pointer;margin:0}
+.callout-banner{padding:14px 20px;border-radius:10px;margin-bottom:24px;display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600}.callout-warning{background:var(--gray-light);border:1.5px solid var(--gray-border);color:var(--gray)}.callout-warning .callout-dot{width:8px;height:8px;border-radius:50%;background:var(--amber);flex-shrink:0}.callout-success{background:var(--green-light);border:1.5px solid var(--green-border);color:var(--green)}.callout-success .callout-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
+.reminder-wrap{position:relative;display:inline-block}.reminder-menu{position:absolute;top:100%;right:0;margin-top:6px;background:#fff;border:1.5px solid var(--gray-border);border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.08);z-index:20;min-width:280px;overflow:hidden;display:none}.reminder-menu.open{display:block}.reminder-item{padding:12px 18px;font-size:14px;font-weight:500;color:var(--text);cursor:pointer;font-family:'DM Sans',sans-serif}.reminder-item:hover{background:var(--brand-light);color:var(--brand)}.reminder-item+.reminder-item{border-top:1px solid var(--gray-light)}
+.summary-row{display:flex;gap:14px;margin-bottom:24px;flex-wrap:wrap}.summary-card{flex:1;min-width:110px;padding:16px 18px;border-radius:12px;border:1px solid var(--gray-border);background:#fff}.summary-card .sc-label{font-size:11px;font-weight:600;color:var(--gray);margin-bottom:4px}.summary-card .sc-value{font-size:20px;font-weight:800;color:var(--text)}
+.summary-card.green{border-color:var(--green-border);background:var(--green-light)}.summary-card.green .sc-value{color:var(--green)}.summary-card.amber{border-color:var(--amber-border);background:var(--amber-light)}.summary-card.amber .sc-value{color:var(--amber)}.summary-card.red{border-color:var(--red-border);background:var(--red-light)}.summary-card.red .sc-value{color:var(--red)}.summary-card.purple{border-color:#ddd6fe;background:#f5f3ff}.summary-card.purple .sc-value{color:#7c3aed}
+.back-link{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:var(--brand);cursor:pointer;margin-bottom:20px;background:none;border:none;font-family:'DM Sans',sans-serif}.back-link:hover{text-decoration:underline}
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;padding:14px 28px;border-radius:10px;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;box-shadow:0 4px 20px rgba(0,0,0,.15);z-index:100;opacity:0;transition:opacity .3s;pointer-events:none}.toast.show{opacity:1}
+.remind-link{background:none;border:none;color:var(--brand);font-weight:600;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0;text-decoration:underline}.remind-sent-date{font-weight:600;color:var(--text-secondary);font-size:12px}
+.charges-input{width:80px;padding:6px 8px;border:1px solid var(--gray-border);border-radius:6px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;font-weight:600;text-align:right;color:var(--text)}.charges-input:focus{border-color:var(--brand)}
+.tower-card{padding:20px;border:1.5px solid var(--gray-border);border-radius:12px;margin-bottom:16px;background:#fafafa}.tower-card-title{font-size:14px;font-weight:700;color:var(--brand);margin-bottom:14px}.tower-row{display:flex;gap:16px;align-items:flex-start}.tower-row .field{margin-bottom:0}.tower-name-field{width:140px;flex-shrink:0}.tower-flats-field{flex:1}.tower-flats-field textarea{min-height:44px;font-size:14px;padding:10px 14px}
+.flat-table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}.flat-table th{text-align:left;padding:10px 12px;background:var(--gray-light);font-weight:700;color:var(--text-secondary);border-bottom:1.5px solid var(--gray-border);white-space:nowrap}.flat-table td{padding:8px 10px;border-bottom:1px solid var(--gray-light);vertical-align:middle}.flat-table td input{width:100%;padding:6px 8px;border:1px solid var(--gray-border);border-radius:6px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none}.flat-table td input:focus{border-color:var(--brand)}
+.share-card{padding:20px 24px;border:1.5px solid var(--brand);border-radius:12px;background:var(--brand-light);margin-top:24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}.share-card-text{font-size:14px;color:var(--text);line-height:1.5}.share-card-text strong{color:var(--brand)}
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.4);z-index:50;display:none;align-items:center;justify-content:center}.modal-overlay.open{display:flex}.modal-box{background:#fff;border-radius:16px;padding:36px 32px;max-width:420px;width:90%;max-height:90vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.15);position:relative}.modal-box h3{font-size:20px;font-weight:800;color:var(--text);margin-bottom:4px}.modal-box .modal-sub{font-size:14px;color:var(--gray);margin-bottom:24px}
+.error-msg{color:var(--red);font-size:13px;font-weight:600;margin-top:-12px;margin-bottom:16px}
+.owner-cell-name{font-weight:600;color:var(--text)}.owner-cell-phone{font-size:12px;color:var(--gray);margin-top:2px}
+.hub-success{padding:14px 20px;border-radius:10px;margin-bottom:16px;margin-top:8px;background:var(--green-light);border:1.5px solid var(--green-border);color:var(--green);font-size:14px;font-weight:600;display:flex;align-items:center;gap:10px}.hub-success .hs-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
+.col-filter-wrap{position:relative;display:inline-block}
+.col-filter-btn{background:none;border:none;cursor:pointer;color:var(--gray);font-size:10px;margin-left:4px;vertical-align:middle;padding:2px}.col-filter-btn:hover{color:var(--brand)}
+.col-filter-dd{position:absolute;top:100%;left:0;margin-top:4px;background:#fff;border:1.5px solid var(--gray-border);border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.1);z-index:30;min-width:200px;max-height:260px;overflow-y:auto;display:none;padding:8px 0}.col-filter-dd.open{display:block}
+.col-filter-dd .cf-search{width:calc(100% - 16px);margin:0 8px 6px;padding:8px 10px;border:1px solid var(--gray-border);border-radius:6px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none}.col-filter-dd .cf-search:focus{border-color:var(--brand)}
+.col-filter-dd .cf-item{padding:8px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;font-family:'DM Sans',sans-serif;color:var(--text)}.col-filter-dd .cf-item:hover{background:var(--brand-light)}.col-filter-dd .cf-item input{margin:0;accent-color:var(--brand)}
+.col-filter-dd .cf-clear{padding:8px 14px;font-size:12px;color:var(--brand);font-weight:600;cursor:pointer;border-top:1px solid var(--gray-light);margin-top:4px;font-family:'DM Sans',sans-serif}.col-filter-dd .cf-clear:hover{background:var(--brand-light)}
+.col-filter-active{color:var(--brand) !important}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+<button class="back-btn" id="backBtn" onclick="goBack()">&#8592; Back</button>
+<div class="toast" id="toast"></div>
+
+<!-- S0: Welcome -->
+<div class="screen screen-center active" id="screen0">
+  <div class="jio-logo">Jio</div>
+  <p style="color:var(--gray);font-size:15px;margin-top:16px;font-weight:600">Setup your society in minutes to start</p>
+  <h1 style="font-size:28px;font-weight:800;color:var(--text);margin-top:8px;margin-bottom:36px">Welcome to JioSociety</h1>
+  <div class="input-wrap">
+    <div class="field"><label>Your Name</label><input id="adminNameInput" placeholder="Enter your full name" oninput="checkWelcome()"></div>
+    <div class="field">
+      <label>Mobile Number</label>
+      <input type="tel" id="phoneInput" placeholder="Enter your 10-digit mobile number" maxlength="10" oninput="formatPhone(this);checkWelcome()">
+      <div class="field-error-msg" id="phoneError">Please enter a valid 10-digit mobile number</div>
+    </div>
+    <button class="btn-primary full" id="getOtpBtn" disabled onclick="goTo(1)">Get OTP</button>
+  </div>
+</div>
+
+<!-- S1: OTP -->
+<div class="screen screen-center" id="screen1">
+  <div class="jio-logo small">Jio</div>
+  <h2 style="margin-top:20px;margin-bottom:8px">Enter your OTP</h2>
+  <p style="color:var(--gray);font-size:14px;margin-bottom:32px">We've sent a 4-digit code to your mobile number</p>
+  <div class="otp-row" id="otpRow"></div>
+  <div class="input-wrap"><button class="btn-primary full" id="confirmOtpBtn" disabled onclick="goTo(2)">Confirm OTP</button></div>
+  <div style="margin-top:20px;text-align:center"><p style="color:var(--gray);font-size:13px;margin-bottom:4px">Didn't receive your OTP yet?</p><span id="resendArea"></span></div>
+</div>
+
+<!-- S2: Hub -->
+<div class="screen screen-center" id="screen2">
+  <div style="width:100%;max-width:640px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><div style="width:40px;height:40px;border-radius:50%;background:var(--brand);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px">Jio</div><span style="font-weight:800;font-size:20px;color:var(--brand)">JioSociety</span></div>
+    <h1 style="font-size:26px;font-weight:800;color:var(--text);margin-top:16px" id="hubGreeting">Dashboard</h1>
+    <div id="hubSuccessBanner"></div>
+    <p style="color:var(--gray);font-size:15px;margin-top:4px;margin-bottom:8px" id="hubSubtext">Get started by filling in your society details</p>
+    <div class="dash-grid" id="hubGrid"></div>
+  </div>
+</div>
+
+<!-- S3: Society Details -->
+<div class="screen screen-split" id="screen3">
+  <div class="sidebar" id="sidebar3"></div>
+  <div class="content"><h2>Society Details</h2><p class="subtext">Please enter your society details</p>
+    <div class="form-area">
+      <div class="field"><label>Society Name</label><input id="societyNameInput" placeholder="e.g. Sunshine Residency CHS"></div>
+      <p class="section-label">Society Address</p>
+      <div class="field"><label>Street Name</label><input placeholder="e.g. Sector 12, Kharghar"></div>
+      <div class="field"><label>Pincode</label><input type="tel" placeholder="e.g. 410210" id="pincodeInput" oninput="checkPincode()"></div>
+      <div class="row-2"><div class="field"><label>City</label><input id="cityAuto" placeholder="Auto-filled" readonly></div><div class="field"><label>State</label><input id="stateAuto" placeholder="Auto-filled" readonly></div></div>
+      <div style="margin-top:12px"><button class="btn-primary full" onclick="goTo(4)">Next</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- S4: Society Configuration -->
+<div class="screen screen-split" id="screen4">
+  <div class="sidebar" id="sidebar4"></div>
+  <div class="content"><h2>Society Configuration</h2><p class="subtext">Please configure your society</p>
+    <div class="tabs">
+      <div class="tab active" id="tabExcel" onclick="switchTab('excel')"><div class="tab-title">Upload Excel</div><div class="tab-sub">Download template here</div></div>
+      <div class="tab" id="tabManual" onclick="switchTab('manual')"><div class="tab-title">Add Manually</div><div class="tab-sub">Enter tower &amp; flat details</div></div>
+    </div>
+    <div id="excelView"><div class="excel-drop"><div class="arrow">&#8593;</div><p>Drag &amp; drop your Excel file here</p><p class="sub">or click to browse files</p></div></div>
+    <div id="manualView" style="display:none">
+      <div class="field" style="max-width:200px"><label>Number of Towers</label><input type="number" id="towerCountInput" min="1" max="20" placeholder="e.g. 2" oninput="renderTowerCards()"></div>
+      <div id="towerCardsContainer"></div>
+      <div id="towerValidationError" style="display:none;color:var(--red);font-size:13px;font-weight:600;margin-bottom:12px"></div>
+      <div style="margin-top:16px"><button class="btn-primary" onclick="generateFlatTable()" style="font-size:14px;padding:10px 24px">Generate Flat List</button></div>
+      <div id="generatedFlatTableWrap" style="display:none;margin-top:28px">
+        <div class="divider"></div>
+        <h3 style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:4px">Flat Directory</h3>
+        <p style="font-size:13px;color:var(--gray);margin-bottom:16px">Fill in resident details and maintenance charges</p>
+        <div style="overflow-x:auto"><table class="flat-table"><thead><tr><th>Tower</th><th>Flat</th><th>Resident Name</th><th>Phone</th><th>Maintenance Charges<br><span style="font-weight:500;font-size:11px;color:var(--gray)">(Per Month) &#8377;</span></th></tr></thead><tbody id="flatDirBody"></tbody></table></div>
+        <div class="share-card" style="margin-top:20px">
+          <div class="share-card-text"><strong>Share resident onboarding link</strong> to your society WhatsApp group so residents can self-register and claim their flats.</div>
+          <button class="btn-green" onclick="openResidentModal()"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.955 9.955 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18a8 8 0 01-4.108-1.138l-.29-.174-3.01.789.803-2.932-.191-.303A8 8 0 1112 20z"/></svg>Share Link</button>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:28px"><button class="btn-primary" onclick="goTo(5)" style="width:100%;max-width:400px">Finish Setup with Payment Details</button></div>
+  </div>
+</div>
+
+<!-- S5: Payment Details -->
+<div class="screen screen-split" id="screen5">
+  <div class="sidebar" id="sidebar5"></div>
+  <div class="content"><h2>Payment Details</h2><p class="subtext">Verify your society's financial details</p>
+    <div class="form-area">
+      <div class="field"><label>Society PAN Card Number</label><input placeholder="e.g. ABCDE1234F"></div>
+      <div class="upload-field"><label>Upload PAN Card Image</label><div class="upload-box" onclick="this.classList.add('done');this.textContent='&#10003; File uploaded'">Click to upload file</div></div>
+      <div class="field"><label>Society Registration Number</label><input placeholder="e.g. MH/2024/12345"></div>
+      <div class="upload-field"><label>Upload Society Registration Certificate</label><div class="upload-box" onclick="this.classList.add('done');this.textContent='&#10003; File uploaded'">Click to upload file</div></div>
+      <div class="divider"></div>
+      <p class="section-label" style="margin-top:0">Bank Account Details</p>
+      <div class="field"><label>Account Number</label><input placeholder="Enter account number"></div>
+      <div class="field"><label>Re-confirm Account Number</label><input placeholder="Re-enter account number"></div>
+      <div class="field"><label>Account Name</label><input placeholder="Society's bank account name"></div>
+      <div class="field"><label>IFSC Code</label><input placeholder="e.g. SBIN0012345" id="ifscInput" oninput="checkIFSC()"></div>
+      <div class="auto-cards" id="bankAutoCards" style="display:none"><div class="auto-card"><div class="label">Bank Name</div><div class="value">State Bank of India</div></div><div class="auto-card"><div class="label">Branch</div><div class="value">Kharghar Branch</div></div></div>
+      <div class="verified-banner" id="verifiedBanner" style="display:none"><span class="icon">&#10003;</span><span class="text">Account verified successfully</span></div>
+      <div style="display:flex;gap:16px;margin-top:8px"><button class="btn-ghost" onclick="goTo(2)">Fill it Later</button><button class="btn-primary" onclick="handleFinishPayment()" style="flex:1">Finish</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- S6: Collections -->
+<div class="screen" id="screen6" style="display:none;flex-direction:column;padding:36px 48px;overflow:auto">
+  <button class="back-link" onclick="goTo(2)">&#8592; Back to Dashboard</button>
+  <h2 style="font-size:22px;font-weight:800;color:var(--text);margin-bottom:4px">Collections Management</h2>
+  <p style="color:var(--gray);font-size:14px;margin-bottom:24px">Track maintenance payments and send collection requests</p>
+  <div id="collContent">
+    <div id="calloutBanner"></div>
+    <div class="summary-row" id="summaryRow"></div>
+    <div class="coll-header">
+      <div class="coll-header-left"><select class="coll-select" id="monthSelect" onchange="renderCollections()"></select><select class="coll-select" id="yearSelect" onchange="renderCollections()"></select></div>
+      <div class="coll-header-right">
+        <button class="btn-primary" id="sendRequestBtn" onclick="handleSendRequest()" style="font-size:14px;padding:10px 20px">Send Request to All</button>
+        <div class="reminder-wrap"><button class="btn-outline" onclick="toggleReminderMenu()">Send Reminder &#9662;</button><div class="reminder-menu" id="reminderMenu"><div class="reminder-item" onclick="sendBulkReminder()">Send to all with pending dues</div></div></div>
+      </div>
+    </div>
+    <div style="overflow-x:auto"><table class="coll-table" id="collTable"><thead><tr>
+      <th style="width:36px"><input type="checkbox" class="coll-checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+      <th>Flat <span class="col-filter-btn" onclick="openColFilter(event,'flat')">&#9660;</span><div class="col-filter-dd" id="cf-flat"></div></th>
+      <th>Tower <span class="col-filter-btn" onclick="openColFilter(event,'tower')">&#9660;</span><div class="col-filter-dd" id="cf-tower"></div></th>
+      <th>Resident <span class="col-filter-btn" onclick="openColFilter(event,'resident')">&#9660;</span><div class="col-filter-dd" id="cf-resident"></div></th>
+      <th>Charges (&#8377;)</th>
+      <th>Status <span class="col-filter-btn" onclick="openColFilter(event,'status')">&#9660;</span><div class="col-filter-dd" id="cf-status"></div></th>
+      <th>Paid On</th><th>Reminder</th><th style="width:130px">Action</th>
+    </tr></thead><tbody id="collTableBody"></tbody></table></div>
+  </div>
+</div>
+</div>
+
+<!-- Resident Modal -->
+<div class="modal-overlay" id="residentModal">
+  <div class="modal-box">
+    <button style="position:absolute;top:12px;right:16px;background:none;border:none;font-size:22px;color:var(--gray);cursor:pointer" onclick="closeResidentModal()">&#10005;</button>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px"><div style="width:32px;height:32px;border-radius:50%;background:var(--brand);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:11px">Jio</div><span style="font-weight:700;font-size:14px;color:var(--brand)">JioSociety</span></div>
+    <div id="resStep1"><h3>Claim Your Flat</h3><p class="modal-sub">Enter your flat number to get started</p><div class="field"><label>Flat Number</label><input id="resFlatInput" placeholder="e.g. 101"></div><div id="resFlatError" class="error-msg" style="display:none"></div><button class="btn-primary full" onclick="checkFlatClaim()">Check Availability</button></div>
+    <div id="resStep2" style="display:none"><h3>Your Details</h3><p class="modal-sub">Flat <span id="resClaimFlat" style="font-weight:700;color:var(--brand)"></span> is available</p><div class="field"><label>Full Name</label><input id="resNameInput" placeholder="Enter your full name"></div><div class="field"><label>Phone Number</label><input id="resPhoneInput" type="tel" maxlength="10" placeholder="10-digit mobile number" oninput="formatPhone(this)"></div><div class="field-error-msg" id="resPhoneError" style="margin-top:-12px;margin-bottom:12px">Please enter a valid 10-digit number</div><button class="btn-primary full" onclick="residentSendOTP()">Send OTP</button></div>
+    <div id="resStep3" style="display:none"><h3>Verify OTP</h3><p class="modal-sub">Enter the 4-digit code</p><div class="otp-row" id="resOtpRow" style="justify-content:flex-start;gap:8px;margin-bottom:20px"></div><button class="btn-primary full" onclick="residentVerifyOTP()">Verify &amp; Claim Flat</button></div>
+    <div id="resStep4" style="display:none;text-align:center;padding:20px 0"><div style="width:64px;height:64px;border-radius:50%;background:var(--green-light);display:flex;align-items:center;justify-content:center;margin:0 auto 16px"><span style="font-size:32px;color:var(--green)">&#10003;</span></div><h3 style="margin-bottom:8px">Flat Claimed!</h3><p style="color:var(--gray);font-size:14px">Your flat has been successfully registered.</p></div>
+  </div>
+</div>
+
+<script>
+let currentScreen=0,resendInterval=null,paymentSetupDone=false,societySetupDone=false;
+let requestSent={},individualRequestSent={},reminderOpen=false,collData=[],reminderLog={};
+let flatMaster=[];
+let colFilters={flat:null,tower:null,resident:null,status:null},openFilterCol=null;
+// Track deleted requests: key "m-y-idx" -> true
+let deletedRequests={};
+
+const SETUP_STEPS=['Society Details','Society Configuration','Payment Details'];
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const SHORT_MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
+
+// Phone validation: only digits, max 10
+function formatPhone(el){el.value=el.value.replace(/\D/g,'').slice(0,10)}
+function isValidPhone(v){return/^\d{10}$/.test(v)}
+
+function goTo(n){
+  document.getElementById('screen'+currentScreen).classList.remove('active');
+  if(currentScreen===6)document.getElementById('screen6').style.display='none';
+  currentScreen=n;const el=document.getElementById('screen'+n);
+  if(n===6){el.style.display='flex';el.classList.add('active')}else el.classList.add('active');
+  document.getElementById('backBtn').style.display=(n>=3&&n<=5)?'block':'none';
+  if(n===1)startResendTimer();if(n>=3&&n<=5)renderSidebars();if(n===2)renderHub();if(n===6)initCollections();
+}
+function goBack(){if(currentScreen===6)goTo(2);else if(currentScreen===3)goTo(2);else if(currentScreen===4)goTo(3);else if(currentScreen===5)goTo(4);else if(currentScreen>0)goTo(currentScreen-1)}
+function renderSidebars(){for(let s=3;s<=5;s++){const el=document.getElementById('sidebar'+s);if(!el)continue;const step=s-3;el.innerHTML='<div class="sidebar-logo"><div class="sidebar-logo-circle">Jio</div><span class="sidebar-logo-text">JioSociety</span></div>'+SETUP_STEPS.map((name,i)=>{const cls=i===step?'active':i<step?'done':'';return'<div class="sidebar-step '+cls+'"><div class="sidebar-step-num">'+(i<step?'\u2713':i+1)+'</div><span class="sidebar-step-label">'+name+'</span></div>'}).join('')}}
+
+function getSocietyName(){return(document.getElementById('societyNameInput')&&document.getElementById('societyNameInput').value.trim())||''}
+
+function renderHub(){
+  const name=document.getElementById('adminNameInput').value.trim();
+  if(name)document.getElementById('hubGreeting').textContent='Hi '+name.split(' ')[0]+', Welcome!';
+  const sn=getSocietyName();
+  const banner=document.getElementById('hubSuccessBanner');
+  const sub=document.getElementById('hubSubtext');
+  if(paymentSetupDone){
+    banner.innerHTML='<div class="hub-success"><div class="hs-dot"></div>'+(sn||'Your society')+' has been setup on JioSociety.</div>';
+    sub.textContent='Manage your society from here';
+  }else{banner.innerHTML='';sub.textContent=societySetupDone?'Complete payment setup to unlock all features':'Get started by filling in your society details'}
+  const icons={society:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',coll:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>',share:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>',visitor:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>'};
+  const tiles=[
+    {title:societySetupDone?'Edit Society Details':'Fill Society Details',sub:'Configure towers, flats & payments',icon:icons.society,active:true,highlight:!societySetupDone,action:()=>goTo(3)},
+    {title:'Collections Management',sub:'Track payments & send reminders',icon:icons.coll,active:societySetupDone,action:()=>openCollections()},
+    {title:'Share Resident Link',sub:'Invite residents to register',icon:icons.share,active:societySetupDone,action:()=>{flatMaster.length>0?openResidentModal():showToast('Please fill society details first')}},
+    {title:'Visitor Management',sub:'Manage gate entries & passes',icon:icons.visitor,active:societySetupDone,action:()=>{}},
+  ];
+  const g=document.getElementById('hubGrid');
+  g.innerHTML=tiles.map((t,i)=>'<div class="'+(t.highlight?'dash-tile active-tile':t.active?'dash-tile':'dash-tile disabled-tile')+'" data-ti="'+i+'"><div class="dash-tile-icon">'+t.icon+'</div><div class="dash-tile-title">'+t.title+'</div><div class="dash-tile-sub">'+t.sub+'</div></div>').join('');
+  g.querySelectorAll('.dash-tile').forEach((el,i)=>{if(tiles[i].active)el.onclick=tiles[i].action})
+}
+function openCollections(){if(!societySetupDone){showToast('Please fill society details first');return}if(!paymentSetupDone){goTo(5);showToast('Please complete payment setup first');return}goTo(6)}
+
+function checkWelcome(){
+  const n=document.getElementById('adminNameInput').value.trim();
+  const p=document.getElementById('phoneInput').value.replace(/\D/g,'');
+  const errEl=document.getElementById('phoneError');
+  if(p.length>0&&p.length<10){errEl.style.display='block';document.getElementById('phoneInput').classList.add('field-error')}
+  else{errEl.style.display='none';document.getElementById('phoneInput').classList.remove('field-error')}
+  document.getElementById('getOtpBtn').disabled=!(n.length>0&&p.length===10);
+}
+
+function createOTPInputs(){const row=document.getElementById('otpRow');for(let i=0;i<4;i++){const inp=document.createElement('input');inp.type='text';inp.maxLength=1;inp.className='otp-input';inp.addEventListener('input',function(){this.value=this.value.replace(/\D/g,'');this.value?(this.classList.add('filled'),i<3&&row.children[i+1].focus()):this.classList.remove('filled');document.getElementById('confirmOtpBtn').disabled=!Array.from(row.children).every(x=>x.value)});inp.addEventListener('keydown',function(e){if(e.key==='Backspace'&&!this.value&&i>0)row.children[i-1].focus()});row.appendChild(inp)}}
+function startResendTimer(){let t=30;clearInterval(resendInterval);const a=document.getElementById('resendArea');a.innerHTML='<span style="color:var(--gray);font-size:13px">Resend in <span id="resendTimer">30</span>s</span>';resendInterval=setInterval(()=>{t--;const el=document.getElementById('resendTimer');if(el)el.textContent=t;if(t<=0){clearInterval(resendInterval);a.innerHTML='<button class="btn-secondary" onclick="startResendTimer()">Generate OTP again</button>'}},1000)}
+function checkPincode(){const v=document.getElementById('pincodeInput').value.replace(/\D/g,'');document.getElementById('cityAuto').value=v.length===6?'Mumbai':'';document.getElementById('stateAuto').value=v.length===6?'Maharashtra':''}
+function switchTab(tab){document.getElementById('tabExcel').classList.toggle('active',tab==='excel');document.getElementById('tabManual').classList.toggle('active',tab==='manual');document.getElementById('excelView').style.display=tab==='excel'?'block':'none';document.getElementById('manualView').style.display=tab==='manual'?'block':'none'}
+function checkIFSC(){document.getElementById('bankAutoCards').style.display=document.getElementById('ifscInput').value.length>=4?'flex':'none'}
+function handleFinishPayment(){paymentSetupDone=true;societySetupDone=true;document.getElementById('verifiedBanner').style.display='flex';showToast('Payment details saved!');setTimeout(()=>goTo(2),1000)}
+function renderTowerCards(){const c=parseInt(document.getElementById('towerCountInput').value)||0;const el=document.getElementById('towerCardsContainer');el.innerHTML='';for(let i=0;i<Math.min(c,20);i++)el.innerHTML+='<div class="tower-card"><div class="tower-card-title">Tower '+(i+1)+'</div><div class="tower-row"><div class="field tower-name-field"><label>Tower Name</label><input id="towerName'+i+'" placeholder="e.g. A, B"></div><div class="field tower-flats-field"><label>Flat Numbers (comma separated)</label><textarea id="towerFlats'+i+'" placeholder="e.g. 101, 102, 201, 202"></textarea></div></div></div>'}
+function generateFlatTable(){const c=parseInt(document.getElementById('towerCountInput').value)||0;const err=document.getElementById('towerValidationError');err.style.display='none';let nf=[];for(let i=0;i<c;i++){const tN=(document.getElementById('towerName'+i).value||'').trim()||('Tower '+(i+1));const fl=(document.getElementById('towerFlats'+i).value||'').split(',').map(f=>f.trim()).filter(f=>f);const seen=new Set();for(const f of fl){if(seen.has(f)){err.textContent='Duplicate flat "'+f+'" in '+tN;err.style.display='block';return}seen.add(f)}fl.forEach(f=>nf.push({tower:tN,flat:f,name:'',phone:'',claimed:false,rent:''}))}if(!nf.length){showToast('Enter at least one tower with flats');return}flatMaster=nf;societySetupDone=true;renderFlatDirectory();document.getElementById('generatedFlatTableWrap').style.display='block';showToast(flatMaster.length+' flats generated')}
+function renderFlatDirectory(){document.getElementById('flatDirBody').innerHTML=flatMaster.map((f,i)=>'<tr><td style="font-weight:600">'+f.tower+'</td><td style="font-weight:600">'+f.flat+'</td><td><input value="'+f.name+'" placeholder="Resident name" onchange="flatMaster['+i+'].name=this.value;flatMaster['+i+'].claimed=!!this.value"></td><td><input value="'+f.phone+'" placeholder="Phone number" maxlength="10" oninput="formatPhone(this)" onchange="flatMaster['+i+'].phone=this.value"></td><td><input class="charges-input" value="'+(f.rent||'')+'" placeholder="0" style="width:100px" onchange="flatMaster['+i+'].rent=this.value"></td></tr>').join('')}
+
+let residentClaimFlat=null;
+function openResidentModal(){document.getElementById('residentModal').classList.add('open');['resStep1','resStep2','resStep3','resStep4'].forEach((s,i)=>document.getElementById(s).style.display=i===0?'block':'none');document.getElementById('resFlatInput').value='';document.getElementById('resFlatError').style.display='none'}
+function closeResidentModal(){document.getElementById('residentModal').classList.remove('open')}
+function checkFlatClaim(){const fv=document.getElementById('resFlatInput').value.trim();const err=document.getElementById('resFlatError');if(!fv){err.textContent='Please enter a flat number';err.style.display='block';return}const m=flatMaster.find(f=>f.flat===fv);if(!m){err.textContent='Flat not found';err.style.display='block';return}if(m.claimed||m.phone){err.textContent='Already claimed by '+m.name;err.style.display='block';return}err.style.display='none';residentClaimFlat=m;document.getElementById('resClaimFlat').textContent=m.tower+' - '+m.flat;document.getElementById('resStep1').style.display='none';document.getElementById('resStep2').style.display='block';document.getElementById('resPhoneError').style.display='none'}
+function residentSendOTP(){
+  const n=document.getElementById('resNameInput').value.trim();
+  const p=document.getElementById('resPhoneInput').value.replace(/\D/g,'');
+  const errEl=document.getElementById('resPhoneError');
+  if(!n){showToast('Please enter your name');return}
+  if(!isValidPhone(p)){errEl.style.display='block';return}
+  errEl.style.display='none';
+  const row=document.getElementById('resOtpRow');row.innerHTML='';
+  for(let i=0;i<4;i++){const inp=document.createElement('input');inp.type='text';inp.maxLength=1;inp.className='otp-input';inp.style.cssText='width:46px;height:54px;font-size:22px';inp.addEventListener('input',function(){this.value=this.value.replace(/\D/g,'');this.value?(this.classList.add('filled'),i<3&&row.children[i+1].focus()):this.classList.remove('filled')});inp.addEventListener('keydown',function(e){if(e.key==='Backspace'&&!this.value&&i>0)row.children[i-1].focus()});row.appendChild(inp)}
+  document.getElementById('resStep2').style.display='none';document.getElementById('resStep3').style.display='block'}
+function residentVerifyOTP(){if(residentClaimFlat){residentClaimFlat.name=document.getElementById('resNameInput').value.trim();residentClaimFlat.phone=document.getElementById('resPhoneInput').value.replace(/\D/g,'');residentClaimFlat.claimed=true;renderFlatDirectory()}document.getElementById('resStep3').style.display='none';document.getElementById('resStep4').style.display='block'}
+
+// ═══ COLLECTIONS ═══
+function getAllCollResidents(){if(flatMaster.length>0)return flatMaster.map(f=>({flat:f.flat,tower:f.tower,owner:f.name||'',phone:f.phone||'',amount:parseInt(f.rent)||3500,isClaimed:!!(f.phone&&f.phone.trim())}));return[]}
+function getPaymentData(month,year){
+  const now=new Date(),res=getAllCollResidents();const isPast=(year<now.getFullYear())||(year===now.getFullYear()&&month<now.getMonth());const isCurrent=(year===now.getFullYear()&&month===now.getMonth());const key=month+'-'+year,bulkSent=!!requestSent[key];
+  return res.map((r,i)=>{const seed=(month*31+i*7+year)%10;const indKey=month+'-'+year+'-'+r.tower+'-'+r.flat;const thisSent=bulkSent||!!individualRequestSent[indKey];const delKey=month+'-'+year+'-'+i;const wasDeleted=!!deletedRequests[delKey];let status,paidDate;
+    if(!r.isClaimed){status='Unclaimed';paidDate='\u2014'}
+    else if(wasDeleted){status='No Active Request';paidDate='\u2014'}
+    else if(isCurrent&&!thisSent){status='Not Sent';paidDate='\u2014'}
+    else if(isCurrent&&thisSent){status=seed<4?'Paid':'Pending';paidDate=status==='Paid'?String(Math.min(28,2+seed*2)).padStart(2,'0')+'/'+String(month+1).padStart(2,'0')+'/'+year:'\u2014'}
+    else if(isPast){status=seed<7?'Paid':seed<9?'Pending':'Overdue';paidDate=status==='Paid'?String(Math.min(28,5+seed*3)).padStart(2,'0')+'/'+String(month+1).padStart(2,'0')+'/'+year:'\u2014'}
+    else{status='Pending';paidDate='\u2014'}
+    return{...r,status,paidDate,selected:false}})
+}
+function initCollections(){
+  const now=new Date(),cm=now.getMonth(),cy=now.getFullYear();
+  const mSel=document.getElementById('monthSelect');mSel.innerHTML='';for(let m=cm;m>=0;m--){const o=document.createElement('option');o.value=m;o.textContent=MONTHS[m];mSel.appendChild(o)}if(cm<6)for(let m=11;m>cm;m--){const o=document.createElement('option');o.value=m;o.textContent=MONTHS[m];o.dataset.prevYear='1';mSel.appendChild(o)}
+  const ySel=document.getElementById('yearSelect');ySel.innerHTML='';[cy,cy-1].forEach(y=>{const o=document.createElement('option');o.value=y;o.textContent=y;ySel.appendChild(o)});
+  colFilters={flat:null,tower:null,resident:null,status:null};renderCollections();
+}
+function getSelMY(){const mSel=document.getElementById('monthSelect'),ySel=document.getElementById('yearSelect');const m=parseInt(mSel.value);const opt=mSel.options[mSel.selectedIndex];return{month:m,year:opt.dataset.prevYear?parseInt(ySel.value)-1:parseInt(ySel.value)}}
+
+function renderCollections(){
+  const{month,year}=getSelMY();const now=new Date();const isCurrent=(month===now.getMonth()&&year===now.getFullYear());const key=month+'-'+year,bulkSent=!!requestSent[key];
+  collData=getPaymentData(month,year);
+  const unclaimed=collData.filter(r=>r.status==='Unclaimed').length,notSent=collData.filter(r=>r.status==='Not Sent').length,noReq=collData.filter(r=>r.status==='No Active Request').length,paid=collData.filter(r=>r.status==='Paid').length,pending=collData.filter(r=>r.status==='Pending').length,overdue=collData.filter(r=>r.status==='Overdue').length,collected=collData.filter(r=>r.status==='Paid').reduce((s,r)=>s+r.amount,0);
+
+  const banner=document.getElementById('calloutBanner');
+  if(isCurrent&&(notSent>0||noReq>0)&&unclaimed>0)banner.innerHTML='<div class="callout-banner callout-warning"><div class="callout-dot"></div>Request not sent to '+(notSent+noReq)+' resident(s). '+unclaimed+' flat(s) still unclaimed.</div>';
+  else if(isCurrent&&(notSent>0||noReq>0))banner.innerHTML='<div class="callout-banner callout-warning"><div class="callout-dot"></div>Payment request not sent to '+(notSent+noReq)+' resident(s) for '+MONTHS[month]+'.</div>';
+  else if(isCurrent&&notSent===0&&noReq===0&&unclaimed>0)banner.innerHTML='<div class="callout-banner callout-success"><div class="callout-dot"></div>Request sent to all claimed flats. '+unclaimed+' unclaimed flat(s) skipped.</div>';
+  else if(isCurrent&&notSent===0&&noReq===0&&unclaimed===0)banner.innerHTML='<div class="callout-banner callout-success"><div class="callout-dot"></div>Payment request sent to all residents for '+MONTHS[month]+' '+year+'.</div>';
+  else banner.innerHTML='';
+
+  let s='<div class="summary-card"><div class="sc-label">Total Flats</div><div class="sc-value">'+collData.length+'</div></div>';
+  s+='<div class="summary-card green"><div class="sc-label">Paid</div><div class="sc-value">'+paid+'</div></div>';
+  s+='<div class="summary-card amber"><div class="sc-label">Pending</div><div class="sc-value">'+(pending+notSent+noReq)+'</div></div>';
+  s+='<div class="summary-card red"><div class="sc-label">Overdue</div><div class="sc-value">'+overdue+'</div></div>';
+  if(unclaimed>0)s+='<div class="summary-card purple"><div class="sc-label">Unclaimed Flats</div><div class="sc-value">'+unclaimed+'</div></div>';
+  s+='<div class="summary-card"><div class="sc-label">Collected</div><div class="sc-value">\u20B9'+collected.toLocaleString('en-IN')+'</div></div>';
+  document.getElementById('summaryRow').innerHTML=s;
+
+  const btn=document.getElementById('sendRequestBtn');
+  if(isCurrent&&!bulkSent){btn.disabled=false;btn.textContent='Send Request to All'}else{btn.disabled=true;btn.textContent=bulkSent?'Request Sent to All':'Send Request to All'}
+
+  let filtered=collData;
+  if(colFilters.flat)filtered=filtered.filter(r=>colFilters.flat.has(r.flat));
+  if(colFilters.tower)filtered=filtered.filter(r=>colFilters.tower.has(r.tower));
+  if(colFilters.resident)filtered=filtered.filter(r=>colFilters.resident.has(r.owner||'(Unclaimed)'));
+  if(colFilters.status)filtered=filtered.filter(r=>colFilters.status.has(r.status));
+
+  document.getElementById('collTableBody').innerHTML=filtered.map(r=>{
+    const ri=collData.indexOf(r);let statusHTML,reminderHTML='',actionHTML='';
+    const rKey=month+'-'+year+'-'+ri;const log=reminderLog[rKey];
+    const ownerCell=r.isClaimed?'<div class="owner-cell-name">'+r.owner+'</div><div class="owner-cell-phone">'+r.phone+'</div>':'<span style="color:#7c3aed;font-weight:600;font-size:12px">Flat not claimed yet</span>';
+    if(r.status==='Unclaimed'){statusHTML='<span class="status-badge status-unclaimed">Unclaimed Flat</span>'}
+    else if(r.status==='No Active Request'){statusHTML='<span class="status-badge status-no-request">No Active Request</span>';actionHTML='<button class="btn-sm btn-sm-brand" onclick="resendRequest('+ri+')" style="font-size:12px;padding:5px 12px">Send Request</button>'}
+    else if(r.status==='Not Sent'){statusHTML='<span class="status-badge status-not-sent">Not Sent</span>';actionHTML='<button class="btn-sm btn-sm-brand" onclick="sendIndividualRequest('+ri+')" style="font-size:12px;padding:5px 12px">Send Request</button>'}
+    else if(r.status==='Paid'){statusHTML='<span class="status-badge status-paid">Paid</span>'}
+    else{const sc=r.status==='Overdue'?'status-overdue':'status-pending';statusHTML='<span class="status-badge '+sc+'">'+r.status+'</span>';
+      if(log&&log.lastSent){const d=log.lastSent;reminderHTML='<div><div class="remind-sent-date">Sent '+String(d.getDate()).padStart(2,'0')+' '+SHORT_MONTHS[d.getMonth()]+'</div><button class="remind-link" onclick="sendIndividualReminder('+ri+')">Resend</button></div>'}else reminderHTML='<button class="remind-link" onclick="sendIndividualReminder('+ri+')">Send</button>';
+      actionHTML='<button class="btn-danger-sm" onclick="deleteReq('+ri+')">Delete Payment Request</button>'}
+    return'<tr><td><input type="checkbox" class="coll-checkbox row-check" onchange="updateRowSel('+ri+',this.checked)"'+(r.selected?' checked':'')+'></td><td style="font-weight:600">'+r.flat+'</td><td>'+r.tower+'</td><td>'+ownerCell+'</td><td><input class="charges-input" value="'+r.amount+'" onchange="collData['+ri+'].amount=parseInt(this.value)||0"></td><td>'+statusHTML+'</td><td style="color:var(--gray);font-size:13px">'+r.paidDate+'</td><td>'+reminderHTML+'</td><td style="white-space:nowrap">'+actionHTML+'</td></tr>'
+  }).join('');
+  document.getElementById('selectAll').checked=false;
+  ['flat','tower','resident','status'].forEach(c=>{const b=document.querySelector('[onclick="openColFilter(event,\''+c+'\')"]');if(b)b.className='col-filter-btn'+(colFilters[c]?' col-filter-active':'')});
+}
+
+function handleSendRequest(){const{month,year}=getSelMY();const unc=collData.filter(r=>r.status==='Unclaimed').length;requestSent[month+'-'+year]=true;showToast(unc>0?'Request sent! '+unc+' unclaimed flat(s) skipped.':'Payment request sent to all residents');renderCollections()}
+function sendIndividualRequest(i){const{month,year}=getSelMY();const r=collData[i];individualRequestSent[month+'-'+year+'-'+r.tower+'-'+r.flat]=true;showToast('Request sent to '+(r.owner||r.flat));renderCollections()}
+function resendRequest(i){const{month,year}=getSelMY();delete deletedRequests[month+'-'+year+'-'+i];const r=collData[i];individualRequestSent[month+'-'+year+'-'+r.tower+'-'+r.flat]=true;showToast('Request resent to '+(r.owner||r.flat));renderCollections()}
+function deleteReq(i){const{month,year}=getSelMY();deletedRequests[month+'-'+year+'-'+i]=true;showToast('Payment request deleted');renderCollections()}
+function toggleSelectAll(){const ch=document.getElementById('selectAll').checked;collData.forEach(r=>r.selected=ch);document.querySelectorAll('.row-check').forEach(cb=>cb.checked=ch)}
+function updateRowSel(i,ch){collData[i].selected=ch;document.getElementById('selectAll').checked=collData.every(r=>r.selected)}
+function toggleReminderMenu(){reminderOpen=!reminderOpen;document.getElementById('reminderMenu').classList.toggle('open',reminderOpen)}
+function sendBulkReminder(){reminderOpen=false;document.getElementById('reminderMenu').classList.remove('open');const{month,year}=getSelMY();const now=new Date();let c=0;collData.forEach((r,i)=>{if(r.status==='Pending'||r.status==='Overdue'){reminderLog[month+'-'+year+'-'+i]={lastSent:now};c++}});if(!c){showToast('No pending dues');return}showToast('Reminder sent to '+c+' resident(s)');renderCollections()}
+function sendIndividualReminder(i){const{month,year}=getSelMY();reminderLog[month+'-'+year+'-'+i]={lastSent:new Date()};showToast('Reminder sent to '+(collData[i].owner||collData[i].flat));renderCollections()}
+
+// Column filters
+function openColFilter(e,col){e.stopPropagation();document.querySelectorAll('.col-filter-dd').forEach(d=>d.classList.remove('open'));if(openFilterCol===col){openFilterCol=null;return}openFilterCol=col;const dd=document.getElementById('cf-'+col);let values=[];
+  if(col==='flat')values=[...new Set(collData.map(r=>r.flat))].sort();else if(col==='tower')values=[...new Set(collData.map(r=>r.tower))].sort();else if(col==='resident')values=[...new Set(collData.map(r=>r.owner||'(Unclaimed)'))].sort();else if(col==='status')values=[...new Set(collData.map(r=>r.status))];
+  const sel=colFilters[col];const isText=(col==='flat'||col==='resident');let html='';if(isText)html+='<input class="cf-search" placeholder="Type to search..." oninput="filterDDItems(this,\''+col+'\')">';
+  html+=values.map(v=>{const ch=!sel||sel.has(v);return'<label class="cf-item" data-val="'+v.replace(/"/g,'&quot;')+'"><input type="checkbox" '+(ch?'checked':'')+' onchange="toggleCFVal(\''+col+'\',\''+v.replace(/'/g,"\\'")+'\',this.checked)"> '+v+'</label>'}).join('');
+  html+='<div class="cf-clear" onclick="clearCF(\''+col+'\')">Clear Filter</div>';dd.innerHTML=html;dd.classList.add('open')}
+function filterDDItems(inp,col){const q=inp.value.toLowerCase();document.getElementById('cf-'+col).querySelectorAll('.cf-item').forEach(it=>{it.style.display=it.dataset.val.toLowerCase().includes(q)?'flex':'none'})}
+function toggleCFVal(col,val,ch){if(!colFilters[col]){let all;if(col==='flat')all=[...new Set(collData.map(r=>r.flat))];else if(col==='tower')all=[...new Set(collData.map(r=>r.tower))];else if(col==='resident')all=[...new Set(collData.map(r=>r.owner||'(Unclaimed)'))];else all=[...new Set(collData.map(r=>r.status))];colFilters[col]=new Set(all)}if(ch)colFilters[col].add(val);else colFilters[col].delete(val);let ac;if(col==='flat')ac=new Set(collData.map(r=>r.flat)).size;else if(col==='tower')ac=new Set(collData.map(r=>r.tower)).size;else if(col==='resident')ac=new Set(collData.map(r=>r.owner||'(Unclaimed)')).size;else ac=new Set(collData.map(r=>r.status)).size;if(colFilters[col].size>=ac)colFilters[col]=null;renderCollections()}
+function clearCF(col){colFilters[col]=null;openFilterCol=null;document.getElementById('cf-'+col).classList.remove('open');renderCollections()}
+
+document.addEventListener('click',e=>{if(!e.target.closest('.reminder-wrap')){reminderOpen=false;document.getElementById('reminderMenu').classList.remove('open')}if(!e.target.closest('.col-filter-dd')&&!e.target.closest('.col-filter-btn')){openFilterCol=null;document.querySelectorAll('.col-filter-dd').forEach(d=>d.classList.remove('open'))}});
+createOTPInputs();renderSidebars();
+</script>
+</body>
+</html>
